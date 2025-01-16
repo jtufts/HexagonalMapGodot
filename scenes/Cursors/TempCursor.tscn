@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://du1ffmmy68hsi"]
+
+[ext_resource type="PackedScene" uid="uid://xm2lgya4capr" path="res://scenes/Cursors/hexagon_cursor.tscn" id="1_yqboh"]
+
+[node name="Cursor" type="Node3D"]
+
+[node name="Marker3D" type="Marker3D" parent="."]
+
+[node name="hexagon_cursor2" parent="." instance=ExtResource("1_yqboh")]

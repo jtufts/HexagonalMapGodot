@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://5hq7deseilvo"]
+
+[ext_resource type="PackedScene" uid="uid://clrxoi4yqjv2y" path="res://assets/Meshes/hut.glb" id="1_0a0r6"]
+
+[node name="VillageScene" type="Node3D"]
+
+[node name="hut" parent="." instance=ExtResource("1_0a0r6")]
+transform = Transform3D(0.999995, 0.00244017, -0.00223007, -0.00243921, 0.999997, 0.000432898, 0.00223112, -0.000427469, 0.999997, -0.00161916, 0, 0.00174335)
+
+[node name="hut2" parent="." instance=ExtResource("1_0a0r6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00161916, 0, -0.822299)
+
+[node name="hut3" parent="." instance=ExtResource("1_0a0r6")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.456061, 0.00785655, -0.98226)
+
+[node name="hut4" parent="." instance=ExtResource("1_0a0r6")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 0.880591, 0, -0.65749)
