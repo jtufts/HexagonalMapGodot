@@ -24,6 +24,11 @@ To get started with this project, follow these steps:
 1. Clone the repository to your local machine.
 2. Open the project with Godot 4.2 or later
 
+## Video 
+
+Video Overview:
+https://youtu.be/DLKB5NiqYps
+
 ### Donation
 Consider making me work faster with a coffee:
 https://www.buymeacoffee.com/forlornu
