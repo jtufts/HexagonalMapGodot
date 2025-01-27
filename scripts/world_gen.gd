@@ -151,6 +151,7 @@ func init_tile(tile : Tile, position : Vector3, grid_position : Vector2i):
 	tile_parent.add_child(tile)
 	tile.column = grid_position.x
 	tile.row = grid_position.y
+	tile.biome = Tile.biome_type.find_key(tile.meshdata.type)
 
 
 ##Debug and test stuff. Add Labels to show coordinates

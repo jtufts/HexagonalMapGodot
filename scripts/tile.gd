@@ -6,3 +6,4 @@ var meshdata : TileMeshData
 var occupier : Unit
 var column : int
 var row : int
+var biome : String
