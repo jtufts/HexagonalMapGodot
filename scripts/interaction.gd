@@ -31,7 +31,7 @@ func _input(event: InputEvent) -> void:
 		var hit_object = raycast_at_mouse(origin, end)
 		if not hit_object:
 			return
-		if Input.is_action_just_pressed("Click"):
+		if Input.is_action_just_pressed("Click") and event.pressed:
 			attempt_select(hit_object)
 		elif Input.is_action_just_pressed("RightClick"):
 			attempt_move_unit(hit_object)
@@ -88,6 +88,7 @@ func highlight_tile(tile):
 	hide_cursor(unit_cursor)
 	move_cursor(tile_cursor, tile.global_position)
 	tile_cursor.visible = true
+	print(tile.biome)
 
 
 func highlight_unit(unit):
