@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TileMeshData" load_steps=3 format=3 uid="uid://bbnfty2f3t1g1"]
+
+[ext_resource type="Script" path="res://scripts/tile_mesh_data.gd" id="1_odvnn"]
+[ext_resource type="PackedScene" uid="uid://dfv81u805a5s4" path="res://assets/Meshes/Tiles/roughhexagon.glb" id="1_t7ci4"]
+
+[resource]
+script = ExtResource("1_odvnn")
+mesh = ExtResource("1_t7ci4")
+color = Color(0.724129, 0.609194, 0.296689, 1)
+type = 2

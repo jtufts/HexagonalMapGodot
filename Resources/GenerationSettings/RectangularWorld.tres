@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="GenerationSettings" load_steps=7 format=3 uid="uid://syfsjhs1wb2g"]
+
+[ext_resource type="Script" path="res://scripts/generation_settings.gd" id="1_lkjxv"]
+[ext_resource type="Script" path="res://scripts/tile_mesh_data.gd" id="2_vtvnh"]
+[ext_resource type="Resource" uid="uid://dldfjjhoeqrfu" path="res://Resources/Tiles/Grassland.tres" id="3_23r4b"]
+[ext_resource type="Resource" uid="uid://bbnfty2f3t1g1" path="res://Resources/Tiles/Desert.tres" id="4_mjhyb"]
+[ext_resource type="Resource" uid="uid://3nrb2x1h7p1f" path="res://Resources/Tiles/Ocean.tres" id="5_12boj"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_g5j8m"]
+frequency = 0.1083
+
+[resource]
+script = ExtResource("1_lkjxv")
+tiles = Array[ExtResource("2_vtvnh")]([ExtResource("4_mjhyb"), ExtResource("3_23r4b"), ExtResource("5_12boj")])
+biome_weights = Array[float]([0.6, 1.0, 0.75])
+tile_size = 1.0
+radius = 12
+noise = SubResource("FastNoiseLite_g5j8m")
+debug = false
+map_shape = 1
+spawn_villages = true
+map_edge_buffer = 2
+spacing = 6

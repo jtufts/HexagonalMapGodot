@@ -2,33 +2,43 @@ extends Node
 class_name ObjectPlacer
 
 @export var village : PackedScene
+@export var debug : bool
 
-func place_villages(tiles : Array[Tile], villages_count : int, spacing : int):
+func place_villages(tiles : Array[Tile], spacing : int):
 	var tiles_copy = tiles.duplicate(true) #copy tiles and leave original unaffected
 	var placed_positions = []
 	var current_index = 0	
 	tiles_copy.shuffle()
 	
-	while placed_positions.size() < villages_count and current_index < tiles_copy.size():
+	while current_index < tiles_copy.size():
 		# Select random tile from array
-		var candidate = tiles_copy[current_index]
+		var candidate : Tile = tiles_copy[current_index]
 		current_index += 1
 		var valid = true
 		
 		# check against previous villages
-		for pos : Vector2 in placed_positions:
-			var placed_col = pos.x
-			var placed_row = pos.y
-			if abs(placed_col - candidate.column) <= spacing and abs(placed_row - candidate.row) <= spacing:
+		for previous : Vector2 in placed_positions:
+			var c_diff = abs(previous.x - candidate.pos_data.grid_position.x)
+			var r_diff = abs(previous.y - candidate.pos_data.grid_position.y)
+			var delta = abs((previous.x + previous.y) - (candidate.pos_data.grid_position.x + candidate.pos_data.grid_position.y))
+			var ring_distance = max(c_diff, r_diff, delta)
+			if ring_distance <= spacing:
 				valid = false
+				if debug:
+					debug_tile(candidate, previous)
 				break
 				
 		if valid:
-			placed_positions.append(Vector2(candidate.column, candidate.row))
+			placed_positions.append(Vector2(candidate.pos_data.grid_position.x, candidate.pos_data.grid_position.y))
 			spawn_on_tile(candidate, village)
+			if debug:
+				candidate.debug_label.modulate = Color.WEB_GREEN
+	print("placed " + str(placed_positions.size()) + " in " + str(current_index) + " attempts")
 
-	print("placed " + str(placed_positions.size()) + " villages out of requested " + str(villages_count))
-	print("Performed " + str(current_index) + " attempts to find tiles for villages.")
+
+func debug_tile(tile : Tile, neighbor : Vector2):
+	tile.debug_label.modulate = Color.RED
+	tile.debug_label.text = "BLOCKED:\n" + str(neighbor)
 
 
 # Spawn a unit at a specific tile

@@ -1,18 +1,15 @@
-[gd_scene load_steps=18 format=3 uid="uid://bbqxpsy3vniy8"]
+[gd_scene load_steps=14 format=3 uid="uid://bbqxpsy3vniy8"]
 
 [ext_resource type="Script" path="res://scripts/camera_script.gd" id="1_1xefc"]
 [ext_resource type="Texture2D" uid="uid://dvbkqw12i4obk" path="res://assets/Materials/SkyBG.png" id="2_l7mlp"]
 [ext_resource type="Script" path="res://scripts/world_gen.gd" id="3_davhy"]
-[ext_resource type="Script" path="res://scripts/tile_mesh_data.gd" id="4_ydx7p"]
-[ext_resource type="Resource" uid="uid://dldfjjhoeqrfu" path="res://assets/Resources/Tiles/Grassland.tres" id="5_o7307"]
-[ext_resource type="Resource" uid="uid://bbnfty2f3t1g1" path="res://assets/Resources/Tiles/Desert.tres" id="6_bywl3"]
-[ext_resource type="Resource" uid="uid://3nrb2x1h7p1f" path="res://assets/Resources/Tiles/Ocean.tres" id="7_caxb0"]
+[ext_resource type="Resource" uid="uid://d05e2hqkuydoe" path="res://Resources/GenerationSettings/HexagonalWorld.tres" id="4_ft865"]
 [ext_resource type="PackedScene" uid="uid://grijaagmqw4" path="res://scenes/Units/prototype_unit.tscn" id="8_r58of"]
 [ext_resource type="Script" path="res://scripts/object_placer.gd" id="9_p13dw"]
 [ext_resource type="Script" path="res://scripts/pathfinder.gd" id="10_0b4my"]
 [ext_resource type="PackedScene" uid="uid://5hq7deseilvo" path="res://scenes/POI/VillageScene.tscn" id="10_hcqfn"]
 [ext_resource type="PackedScene" uid="uid://xm2lgya4capr" path="res://scenes/Cursors/hexagon_cursor.tscn" id="11_rshvd"]
-[ext_resource type="PackedScene" uid="uid://bb3hit25an5ti" path="res://scenes/Cursors/hex_overlay.tscn" id="12_0kgq4"]
+[ext_resource type="PackedScene" uid="uid://bb3hit25an5ti" path="res://scenes/Cursors/path_overlay.tscn" id="12_0kgq4"]
 [ext_resource type="Script" path="res://scripts/interaction.gd" id="12_tt8b8"]
 [ext_resource type="PackedScene" uid="uid://cqxjxq25t6wuy" path="res://scenes/Cursors/unit_cursor.tscn" id="13_ydfkh"]
 
@@ -27,13 +24,10 @@ ssil_enabled = true
 sdfgi_enabled = true
 glow_enabled = true
 fog_enabled = true
-fog_light_color = Color(0.435136, 0.469117, 0.522523, 1)
+fog_light_color = Color(0.395135, 0.482894, 0.519378, 1)
+fog_density = 0.015
 fog_sky_affect = 0.0
 fog_height = 1.0
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_dmhb6"]
-frequency = 0.08
-fractal_type = 0
 
 [node name="World" type="Node3D"]
 
@@ -51,8 +45,9 @@ environment = SubResource("Environment_f2ci6")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Scene"]
 transform = Transform3D(0.946097, 0.0435415, -0.320944, 0.323884, -0.127189, 0.937509, 0, -0.990922, -0.134436, 0, -1.03826, 0)
-light_color = Color(1, 1, 0.921569, 1)
-light_energy = 0.5
+light_energy = 0.75
+directional_shadow_mode = 0
+sky_mode = 1
 metadata/_edit_lock_ = true
 
 [node name="TileParent" type="Node3D" parent="Scene"]
@@ -76,12 +71,7 @@ stretch_mode = 4
 
 [node name="WorldGenerator" type="Node" parent="Builder" node_paths=PackedStringArray("object_placer", "tile_parent", "pfinder")]
 script = ExtResource("3_davhy")
-tiles = Array[ExtResource("4_ydx7p")]([ExtResource("5_o7307"), ExtResource("6_bywl3"), ExtResource("7_caxb0")])
-biome_weights = Array[float]([0.01, 0.02, 0.03])
-radius = 14
-noise = SubResource("FastNoiseLite_dmhb6")
-debug = true
-village_density = 4.0
+settings = ExtResource("4_ft865")
 object_placer = NodePath("../ObjectPlacer")
 tile_parent = NodePath("../../Scene/TileParent")
 pfinder = NodePath("../Pathfinder")

@@ -1,56 +1,42 @@
 extends Node
 
-@export_category("Tiles")
-@export var tiles : Array[TileMeshData]
-@export var biome_weights : Array[float]
-var tile_script = preload("res://scripts/tile.gd")
+# Constants
 const HEX_TILE_COLLIDER = preload("res://assets/Meshes/HexTileCollider.tscn")
-var tile_materials : Array[StandardMaterial3D]
 
-@export_category("Generation")
-@export_range(0, 99, 1) var radius: int = 5
-var hex_size : float = 1 # for adjustment and spacing
-@export var noise : FastNoiseLite
-var min_noise
-var max_noise
-@export var debug = false
-
-@export_category("Villages")
-@export var map_edge_buffer = 2
-@export_range(1, 99) var village_density
-@export var spacing = 3
-
+# Dependencies
+@export var settings : GenerationSettings
 @export_category("Dependencies")
 @export var object_placer : ObjectPlacer
 @export var tile_parent : Node3D
 
+# Variables
+var tile_script = preload("res://scripts/tile.gd")
+var tile_materials : Array[Material]
 var placed_tiles : Array[Tile]
-const SQRT3 = sqrt(3)
 
-## Test only!
+# Test-only!
 @export var pfinder : Pathfinder
 @export var proto_unit : PackedScene
 
 
 ## Starting point: Generate a random seed, create the tiles, place POI's
 func _ready() -> void:
-	noise.seed = randi() #New seed for this generation
+	settings.noise.seed = randi() #New seed for this generation
 	generate_world()
-	create_starting_units()
+	create_starting_units(4)
 
 
-func create_starting_units():
+func create_starting_units(count : int):
 	## Test pathfinder
-	var test_units = 5
-	while test_units > 0:
+	while count > 0:
 		var r_tile : Tile = placed_tiles.pick_random()
-		if r_tile.meshdata.type == Tile.biome_type.Ocean or r_tile.occupier != null:
+		if r_tile.mesh_data.type == Tile.biome_type.Ocean or r_tile.occupier != null:
 			continue
 		var unit : Unit = proto_unit.instantiate()
 		add_child(unit)
 		unit.place_unit(r_tile.position, r_tile)
 		unit.occupy_tile(r_tile)
-		test_units -= 1
+		count -= 1
 
 
 func generate_world():
@@ -58,7 +44,8 @@ func generate_world():
 	var lasttime = starttime
 	
 	placed_tiles.clear()
-	var positions = calculate_map_positions()
+	var mapper = GridMapper.new()
+	var positions = mapper.calculate_map_positions(settings)
 	print("-- calculate_map_positions took: " + str(Time.get_ticks_msec() - lasttime) + " ms --")
 	lasttime = Time.get_ticks_msec()
 	
@@ -67,62 +54,49 @@ func generate_world():
 	print("-- create_map() took: " + str(Time.get_ticks_msec() - lasttime) + " ms --")
 	lasttime = Time.get_ticks_msec()
 	
-	var placeable = get_placeable_tiles()
-	var village_count = calculate_villages(placeable.size())
-	object_placer.place_villages(placeable, village_count, spacing)
-	print("-- Calculating and placing villages took: " + str(Time.get_ticks_msec() - lasttime) + " ms --")
-	lasttime = Time.get_ticks_msec()
+	if settings.spawn_villages:
+		var placeable = get_placeable_tiles()
+		object_placer.place_villages(placeable, settings.spacing)
+		print("-- Calculating and placing villages took: " + str(Time.get_ticks_msec() - lasttime) + " ms --")
+		lasttime = Time.get_ticks_msec()
 	
-	pfinder.init_map_info(placed_tiles)
+	pfinder.init_map_info(placed_tiles, positions)
 	var endtime = Time.get_ticks_msec()
 	print("-- World generation took: " + str(endtime - starttime) + " ms --")
-
-
-func calculate_map_positions() -> Array[position_data]:
-	var map : Array[position_data]
-	min_noise = 100
-	max_noise = 0
-	for i in range(-radius, radius+1):
-		for j in range(max(-radius, -i - radius), min(radius, -i + radius) + 1):
-			var pos = position_data.new()
-			pos.world_position = tile_to_world(i, j)
-			pos.noise = noise_at_tile(i, j)
-			pos.grid_position = Vector2(i,j)
-			map.append(pos)
-			if pos.noise < min_noise: min_noise = pos.noise
-			if pos.noise > max_noise: max_noise = pos.noise
-	#print("Min noise: " + str(min_noise) + ". Max noise: " + str(max_noise))
-	return map
 
 
 func calculate_biome_weights() -> Array[float]:
 	var sum = 0.0
 	var cumulative_weights : Array[float]
-	for weight in biome_weights:
+	for weight in settings.biome_weights:
 		sum += weight
 		cumulative_weights.append(sum)
 	return cumulative_weights
 
 
 ## total tiles placed follows: 3 * radius * radius + 3 * radius + 1
-func create_map(positions_array : Array[position_data]) -> Array[Tile]:
+func create_map(map_data : MappingData) -> Array[Tile]:
 	var new_map : Array[Tile] = []
 	## Calculate weights for choosing tiles/biomes
 	var weights = calculate_biome_weights()
 	var total = 0.0
-	for w in biome_weights:
+	for w in settings.biome_weights:
 		total += w
 		
 	## Create new materials for each tile type/color
-	for m in tiles:
+	for m in settings.tiles:
+		## Allow for shader overrides
+		if m.shader_override != null:
+			tile_materials.append(m.shader_override)
+			continue
 		var new_mat = StandardMaterial3D.new()
 		new_mat.albedo_color = m.color
 		tile_materials.append(new_mat)
 		
 	## Generate the tiles
-	for pos in positions_array:
-		var new_tile : Tile = tile_at_biome(pos.noise, weights, total)
-		init_tile(new_tile, pos.world_position, pos.grid_position)
+	for pos in map_data.positions:
+		var new_tile : Tile = tile_at_biome(pos.noise, weights, total, map_data.noise_data)
+		init_tile(new_tile, pos)
 		new_map.append(new_tile)
 		debug_tile(new_tile, pos.grid_position)
 			
@@ -131,7 +105,7 @@ func create_map(positions_array : Array[position_data]) -> Array[Tile]:
 
 
 ## Add tile script, add to group, position and parent
-func init_tile(tile : Tile, position : Vector3, grid_position : Vector2i):
+func init_tile(tile : Tile, position : PositionData):
 	if not tile.is_in_group("tiles"):
 		tile.add_to_group("tiles")
 
@@ -143,80 +117,54 @@ func init_tile(tile : Tile, position : Vector3, grid_position : Vector2i):
 	# Set up material override
 	var mesh_instance: MeshInstance3D = tile.get_child(0) as MeshInstance3D
 	if mesh_instance:
-		mesh_instance.material_override = tile_materials[tile.meshdata.index]
+		mesh_instance.material_override = tile_materials[tile.mesh_data.index]
 	else:
 		push_warning("No child of tile - init_tile hexboard.gd")
 		
-	tile.position = position
+	tile.position = position.world_position
 	tile_parent.add_child(tile)
-	tile.column = grid_position.x
-	tile.row = grid_position.y
-	tile.biome = Tile.biome_type.find_key(tile.meshdata.type)
+	tile.pos_data = position
+	tile.biome = Tile.biome_type.find_key(tile.mesh_data.type)
 
 
 ##Debug and test stuff. Add Labels to show coordinates
-func debug_tile(tile : Node3D, grid_position : Vector2):
-	if not debug:
+func debug_tile(tile : Tile, grid_position : Vector2):
+	if not settings.debug:
 		return
 	#Add a label
 	var label = Label3D.new()
 	tile.add_child(label)
-	label.text = str(grid_position.x) + ", " + str(grid_position.y) 
-	label.text += "\n" + str(abs(grid_position.x + grid_position.y))
-	label.position.y += 0.25
-
-
-## Get the world position for flat-side hexagons
-func tile_to_world(i : float, j : float) -> Vector3:
-	var x : float = hex_size * (i * 3/2)
-	var z : float = hex_size * (j * SQRT3 + (i * SQRT3 / 2))
-	return Vector3(x, 0, z)
-
-
-## Get noise from at position of tile
-func noise_at_tile(x, z) -> float:
-	var point_value : float = noise.get_noise_2d(x, z)
-	return (point_value + 1) / 2 # normalize [0, 1]
+	label.text = str(grid_position.x) + ", " + str(grid_position.y)
+	label.text += "\n" + str(-grid_position.x - grid_position.y)
+	label.position.y += 0.4
+	tile.debug_label = label
 
 
 ## Function to select a biome tile based on weighted probabilities
-func tile_at_biome(local_noise, weights : Array[float], total : float) -> Tile:
+func tile_at_biome(local_noise, weights : Array[float], total : float, noisedata : Vector2) -> Tile:
 	# Cumulative probabilities
 	var selected_biome = 0
-	var normalized_noise = ((local_noise - min_noise) / (max_noise - min_noise)) * total
+	var normalized_noise = ((local_noise - noisedata.x) / (noisedata.y - noisedata.x)) * total
 	for i in range(weights.size()):
 		if normalized_noise < weights[i]:
 			selected_biome = i
 			break
 	#Select and instantiate
-	var data = tiles[selected_biome]
+	var data = settings.tiles[selected_biome]
 	var biome = data.mesh
 	var t = biome.instantiate()
 	t.set_script(tile_script)
-	t.meshdata = data
-	t.meshdata.index = selected_biome
+	t.mesh_data = data
+	t.mesh_data.index = selected_biome
 	return t as Tile
-
-
-func calculate_villages(valid_tiles : int) -> int:
-	## calculate roughly the amount of valid tiles and how many villages can be placed
-	var initial = int(valid_tiles * (village_density * 0.01))
-	
-	# Adjust for spacing
-	var invalidated = 0
-	for r in range(1, spacing + 1):
-		invalidated += 6 * r  # Each hexagonal ring has 6 * r tiles
-	var adjusted = initial / (1 + invalidated / valid_tiles)
-
-	return max(1, adjusted)  # At least 1 village
 
 
 ## Ignore buffer and ocean to send to object placer
 func get_placeable_tiles() -> Array[Tile]:
 	var placeable_tiles : Array[Tile] = []
-	var limit = radius - map_edge_buffer
+	var limit = settings.radius - settings.map_edge_buffer
 	for tile : Tile in placed_tiles:
-		if abs(tile.column + tile.row) >= limit or abs(tile.column) >= limit or abs(tile.row) >= limit or tile.meshdata.type == Tile.biome_type.Ocean:
+		if tile.pos_data.buffer or tile.mesh_data.type == Tile.biome_type.Ocean:
 			continue
 		placeable_tiles.append(tile)
 	print(str(placeable_tiles.size()) + " placeable tiles")

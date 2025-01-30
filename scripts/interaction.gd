@@ -88,6 +88,7 @@ func highlight_tile(tile):
 	hide_cursor(unit_cursor)
 	move_cursor(tile_cursor, tile.global_position)
 	tile_cursor.visible = true
+	animate_cursor(tile_cursor)
 	print(tile.biome)
 
 
@@ -101,6 +102,16 @@ func move_cursor(cursor : Node3D, pos : Vector3, height : float = 0):
 	cursor.position = pos
 	if height != 0:
 		tile_cursor.position.y += height
+
+
+func animate_cursor(cursor : Node3D):
+	var tween = get_tree().create_tween()
+	var initial_scale = cursor.scale
+	var target_scale = initial_scale * 1.15
+	tween.set_trans(Tween.TRANS_SPRING)
+	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(cursor, "scale", target_scale, 0.175)
+	tween.tween_property(cursor, "scale", initial_scale, 0.2)
 
 
 func hide_cursor(cursor : Node3D):

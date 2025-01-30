@@ -11,7 +11,6 @@ size = Vector3(1, 1.98462, 1)
 
 [node name="PrototypeUnit" type="Node3D" groups=["units"]]
 script = ExtResource("1_spsi8")
-movement_range = 2
 
 [node name="CSGCylinder3D" type="CSGCylinder3D" parent="."]
 visible = false
