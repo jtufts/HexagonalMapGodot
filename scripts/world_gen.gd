@@ -201,11 +201,11 @@ func tile_to_world(i : float, j : float) -> Vector3:
 func tile_at_biome(x: int, y: int, allCoordinates: Array[Coordinate]) -> Tile:
 	# Cumulative probabilities
 	#0 = grassland, 1 = desert, 2 = ocean, 3 = mountain, 4 = tundra, 5 = snow
-	print(x, " ", y, " ", (map_height * x) + y)
 	var selected_biome = 0
 	var elevation = allCoordinates[(map_height * x) + y].readElevation()
 	var temperature = allCoordinates[(map_height * x) + y].readTemperature()
 	var tundraProbability = (10 - temperature) * 0.2
+	var desertProbability = (temperature - 10) * 0.03
 	var rng = RandomNumberGenerator.new()
 	
 	if y == 0 or y == map_height - 1:
@@ -220,12 +220,11 @@ func tile_at_biome(x: int, y: int, allCoordinates: Array[Coordinate]) -> Tile:
 				if elevation > 4:
 					selected_biome = 3
 				else:
-					if elevation > 1:
-						selected_biome = 0
+					if elevation <= 0:
+						selected_biome = 2
 					else:
-						if (elevation > 0):
-							selected_biome = 1
-						else: selected_biome = 2
+						if rng.randf_range(0, 1) <= desertProbability:
+							selected_biome = 1	
 	#for i in range(weights.size()):
 		#if normalized_noise < weights[i]:
 			#selected_biome = i
@@ -272,10 +271,10 @@ func generateBlob(startX: int, startY: int, startingRatio: float, decay: float) 
 	var rng = RandomNumberGenerator.new()
 	var blobStartX = startX
 	if startX == -1:
-		blobStartX = roundi(rng.randf_range(0, map_width - 1)) #offset for ice caps
+		blobStartX = roundi(rng.randf_range(0, map_width - 1))
 	var blobStartY = startY
 	if startY == -1:
-		blobStartY = roundi(rng.randf_range(0, map_height - 1)) #offset for ice caps
+		blobStartY = roundi(rng.randf_range(5, map_height - 6)) #offset by 5 for ice caps
 	var blobArray : Array[Coordinate] = []
 	blobArray.append(Coordinate.new(blobStartX, blobStartY))
 	var decayingRatio = startingRatio
