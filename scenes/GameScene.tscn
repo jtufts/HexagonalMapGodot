@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bbqxpsy3vniy8"]
+[gd_scene load_steps=22 format=3 uid="uid://bbqxpsy3vniy8"]
 
 [ext_resource type="Script" path="res://scripts/camera_script.gd" id="1_1xefc"]
 [ext_resource type="Texture2D" uid="uid://dvbkqw12i4obk" path="res://assets/Materials/SkyBG.png" id="2_l7mlp"]
@@ -6,8 +6,8 @@
 [ext_resource type="Script" path="res://scripts/tile_mesh_data.gd" id="4_ydx7p"]
 [ext_resource type="Resource" uid="uid://dldfjjhoeqrfu" path="res://assets/Resources/Tiles/Grassland.tres" id="5_o7307"]
 [ext_resource type="Resource" uid="uid://bbnfty2f3t1g1" path="res://assets/Resources/Tiles/Desert.tres" id="6_bywl3"]
-[ext_resource type="Resource" uid="uid://3nrb2x1h7p1f" path="res://assets/Resources/Tiles/Ocean.tres" id="7_caxb0"]
 [ext_resource type="PackedScene" uid="uid://grijaagmqw4" path="res://scenes/Units/prototype_unit.tscn" id="8_r58of"]
+[ext_resource type="PackedScene" uid="uid://dkibj7jx3x1db" path="res://assets/Meshes/flathexagon.glb" id="8_y05nv"]
 [ext_resource type="Script" path="res://scripts/object_placer.gd" id="9_p13dw"]
 [ext_resource type="Script" path="res://scripts/pathfinder.gd" id="10_0b4my"]
 [ext_resource type="PackedScene" uid="uid://5hq7deseilvo" path="res://scenes/POI/VillageScene.tscn" id="10_hcqfn"]
@@ -30,6 +30,30 @@ fog_enabled = true
 fog_light_color = Color(0.435136, 0.469117, 0.522523, 1)
 fog_sky_affect = 0.0
 fog_height = 1.0
+
+[sub_resource type="Resource" id="Resource_e0xut"]
+script = ExtResource("4_ydx7p")
+mesh = ExtResource("8_y05nv")
+color = Color(0.0024976, 0.495515, 0.932237, 1)
+type = 3
+
+[sub_resource type="Resource" id="Resource_t8p75"]
+script = ExtResource("4_ydx7p")
+mesh = ExtResource("8_y05nv")
+color = Color(0.27451, 0.27451, 0.364706, 1)
+type = 4
+
+[sub_resource type="Resource" id="Resource_stcqu"]
+script = ExtResource("4_ydx7p")
+mesh = ExtResource("8_y05nv")
+color = Color(0.788235, 1, 1, 1)
+type = 4
+
+[sub_resource type="Resource" id="Resource_oinoh"]
+script = ExtResource("4_ydx7p")
+mesh = ExtResource("8_y05nv")
+color = Color(1, 1, 1, 1)
+type = 0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_dmhb6"]
 frequency = 0.08
@@ -76,7 +100,7 @@ stretch_mode = 4
 
 [node name="WorldGenerator" type="Node" parent="Builder" node_paths=PackedStringArray("object_placer", "tile_parent", "pfinder")]
 script = ExtResource("3_davhy")
-tiles = Array[ExtResource("4_ydx7p")]([ExtResource("5_o7307"), ExtResource("6_bywl3"), ExtResource("7_caxb0")])
+tiles = Array[ExtResource("4_ydx7p")]([ExtResource("5_o7307"), ExtResource("6_bywl3"), SubResource("Resource_e0xut"), SubResource("Resource_t8p75"), SubResource("Resource_stcqu"), SubResource("Resource_oinoh")])
 biome_weights = Array[float]([0.01, 0.02, 0.03])
 radius = 14
 noise = SubResource("FastNoiseLite_dmhb6")

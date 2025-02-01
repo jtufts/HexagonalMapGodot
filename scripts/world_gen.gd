@@ -112,8 +112,8 @@ func calculate_biome_weights() -> Array[float]:
 func create_map(positions_array : Array[position_data]) -> Array[Tile]:
 	var new_map : Array[Tile] = []
 	var allCoordinates : Array[Coordinate] = []
-	for i in range(0, map_width):
-		for j in range(0, map_height):
+	for i in range(map_width):
+		for j in range(map_height):
 			allCoordinates.append(Coordinate.new(i, j))
 	## Calculate weights for choosing tiles/biomes
 	var weights = calculate_biome_weights()
@@ -122,14 +122,15 @@ func create_map(positions_array : Array[position_data]) -> Array[Tile]:
 		total += w
 	var decayingRatio = 0.80
 	var rng = RandomNumberGenerator.new()
-	for i in range(0, 10):
+	for i in range(0, 8):
 		var blob = generateDrunkenWalkBlob(-1, -1, rng)
 		for tile in blob:
-			allCoordinates[(map_width * tile.y) + tile.x].incrementElevation()
-	for i in range(0, 5):
+			allCoordinates[(map_height * tile.x) + tile.y].incrementElevation()
+	for i in range(0, 4):
 		var blob = generateDrunkenWalkBlob(-1, -1, rng)
 		for tile in blob:
-			allCoordinates[(map_width * tile.y) + tile.x].decrementElevation()
+			allCoordinates[(map_height * tile.x) + tile.y].decrementElevation()
+		
 	## Create new materials for each tile type/color
 	for m in tiles:
 		var new_mat = StandardMaterial3D.new()
@@ -199,15 +200,32 @@ func tile_to_world(i : float, j : float) -> Vector3:
 ## Function to select a biome tile based on weighted probabilities
 func tile_at_biome(x: int, y: int, allCoordinates: Array[Coordinate]) -> Tile:
 	# Cumulative probabilities
-	#0 = grassland, 1 = desert, 2 = ocean
+	#0 = grassland, 1 = desert, 2 = ocean, 3 = mountain, 4 = tundra, 5 = snow
+	print(x, " ", y, " ", (map_height * x) + y)
 	var selected_biome = 0
-	var elevation = allCoordinates[(map_width * y) + x].readElevation()
-	if elevation > 2:
-		selected_biome = 0
+	var elevation = allCoordinates[(map_height * x) + y].readElevation()
+	var temperature = allCoordinates[(map_height * x) + y].readTemperature()
+	var tundraProbability = (10 - temperature) * 0.2
+	var rng = RandomNumberGenerator.new()
+	
+	if y == 0 or y == map_height - 1:
+		selected_biome = 5
 	else:
-		if (elevation > 0):
-			selected_biome = 1
-		else: selected_biome = 2
+		if y == 1 or y == map_height - 2:
+			selected_biome = 2
+		else:
+			if rng.randf_range(0, 1) <= tundraProbability and elevation > 0:
+				selected_biome = 4
+			else:
+				if elevation > 4:
+					selected_biome = 3
+				else:
+					if elevation > 1:
+						selected_biome = 0
+					else:
+						if (elevation > 0):
+							selected_biome = 1
+						else: selected_biome = 2
 	#for i in range(weights.size()):
 		#if normalized_noise < weights[i]:
 			#selected_biome = i
@@ -271,14 +289,14 @@ func generateBlob(startX: int, startY: int, startingRatio: float, decay: float) 
 	
 func generateDrunkenWalkBlob(startX: int, startY: int, rng: RandomNumberGenerator) -> Array[Coordinate]:
 	var decayingRatio = 0.80
-	var blob = generateBlob(startX, startY, decayingRatio, 0.05)
-	decayingRatio -= 0.1
+	var blob = generateBlob(startX, startY, decayingRatio, 0.04)
+	decayingRatio -= 0.08
 	while decayingRatio > 0:
 		var eligibleTiles = findTilesAdjacentToBlob(blob)
 		var newBlobStart = eligibleTiles[rng.randi_range(0, eligibleTiles.size() - 1)]
-		var newBlob = generateBlob(newBlobStart.x, newBlobStart.y, decayingRatio, 0.05)
+		var newBlob = generateBlob(newBlobStart.x, newBlobStart.y, decayingRatio, 0.04)
 		blob = mixBlobsAndEliminateDuplicates(blob, newBlob)
-		decayingRatio -= 0.1
+		decayingRatio -= 0.08
 	return blob
 
 func mixBlobsAndEliminateDuplicates(blob: Array[Coordinate], additionalBlob: Array[Coordinate]):

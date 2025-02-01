@@ -90,7 +90,6 @@ func highlight_tile(tile):
 	tile_cursor.visible = true
 	print(tile.biome)
 
-
 func highlight_unit(unit):
 	move_cursor(unit_cursor, unit.position)
 	unit_cursor.visible = true
