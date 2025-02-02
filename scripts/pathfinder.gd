@@ -39,10 +39,8 @@ func find_reachable_tiles(start : Tile, movement_range: int) -> Array[Node3D]:
 
 		var q = current_tile.column
 		var r = current_tile.row - (current_tile.column - (int(current_tile.column)%2)) / 2
-		print (q, " ", r)
 		# Explore neighbors
 		for direction in NEIGHBOR_DIRECTIONS:
-			print(q + direction.x, " ", r + direction.y + (q + direction.x - (int(q+direction.x)%2)) / 2)
 			var neighbor_coords = Vector2(q + direction.x, r + direction.y + (q + direction.x - (int(q + direction.x)%2)) / 2)
 			if not is_tile_valid(neighbor_coords) or visited.has(neighbor_coords):
 				continue

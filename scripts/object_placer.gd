@@ -19,7 +19,7 @@ func place_villages(tiles : Array[Tile], villages_count : int, spacing : int):
 		for pos : Vector2 in placed_positions:
 			var placed_col = pos.x
 			var placed_row = pos.y
-			if abs(placed_col - candidate.column) <= spacing and abs(placed_row - candidate.row) <= spacing:
+			if abs(placed_col - candidate.column) <= spacing and abs(placed_row - candidate.row) <= spacing: #modify for absolute distance, rather than just distance on one axis or another
 				valid = false
 				break
 				

@@ -315,50 +315,66 @@ func findTilesAdjacentToBlob(blobArray: Array[Coordinate]) -> Array[Coordinate]:
 		var q = coordinate.x
 		var r = coordinate.y - (coordinate.x - (coordinate.x%2)) / 2
 		var s = -q-r
+		const NEIGHBOR_DIRECTIONS = [
+			Vector2(1, 0), Vector2(1, -1), Vector2(0, -1), 
+			Vector2(-1, 0), Vector2(-1, 1), Vector2(0, 1)
+		]
+		
+		for direction in NEIGHBOR_DIRECTIONS:
+			candidateX = q + direction.x
+			if candidateX < 0:
+				candidateX = map_width - 1
+			else:
+				if candidateX > map_width - 1:
+					candidateX = 0
+			candidateY = r + direction.y + ((q+direction.x) - (int(q+direction.x)%2)) / 2
+			if candidateY >= 0 and candidateY <= map_height - 1:
+				if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
+					adjacentTiles.append(Coordinate.new(candidateX, candidateY))
 		#Northwest
-		candidateX = q - 1
-		if candidateX < 0:
-			candidateX = map_width - 1
-		candidateY = r + ((q-1) - ((q-1)%2)) / 2
-		if candidateY >= 0:
-			if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		#North
-		candidateX = q
-		candidateY = (r - 1) + (q - (q%2)) / 2
-		if candidateY >= 0:
-			if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		#Northeast
-		candidateX = q + 1
-		if candidateX >= map_width:
-			candidateX = 0
-		candidateY = (r - 1) + ((q+1) - ((q+1)%2)) / 2
-		if candidateY >= 0:
-			if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		#Southwest
-		candidateX = q - 1
-		if candidateX < 0:
-			candidateX = map_width - 1
-		candidateY = r + 1 + ((q-1) - ((q - 1)%2)) / 2
-		if candidateY < map_height:
-			if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		#South
-		candidateX = q
-		candidateY = r + 1 + (q - (q%2)) / 2
-		if candidateY < map_height:
-			if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		#Southeast
-		candidateX = q + 1
-		if candidateX >= map_width:
-			candidateX = 0
-		candidateY = r + ((q+1) - ((q+1)%2)) / 2
-		if candidateY < map_height:
-			if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				adjacentTiles.append(Coordinate.new(candidateX, candidateY))
+		#candidateX = q - 1
+		#if candidateX < 0:
+			#candidateX = map_width - 1
+		#candidateY = r + ((q-1) - ((q-1)%2)) / 2
+		#if candidateY >= 0:
+			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
+				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
+		##North
+		#candidateX = q
+		#candidateY = (r - 1) + (q - (q%2)) / 2
+		#if candidateY >= 0:
+			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
+				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
+		##Northeast
+		#candidateX = q + 1
+		#if candidateX >= map_width:
+			#candidateX = 0
+		#candidateY = (r - 1) + ((q+1) - ((q+1)%2)) / 2
+		#if candidateY >= 0:
+			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
+				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
+		##Southwest
+		#candidateX = q - 1
+		#if candidateX < 0:
+			#candidateX = map_width - 1
+		#candidateY = r + 1 + ((q-1) - ((q - 1)%2)) / 2
+		#if candidateY < map_height:
+			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
+				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
+		##South
+		#candidateX = q
+		#candidateY = r + 1 + (q - (q%2)) / 2
+		#if candidateY < map_height:
+			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
+				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
+		##Southeast
+		#candidateX = q + 1
+		#if candidateX >= map_width:
+			#candidateX = 0
+		#candidateY = r + ((q+1) - ((q+1)%2)) / 2
+		#if candidateY < map_height:
+			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
+				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
 	return adjacentTiles
 func coordinateIsInArray(x: int, y: int, array: Array[Coordinate]) -> bool:
 	for compareTo : Coordinate in array:

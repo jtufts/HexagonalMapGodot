@@ -41,7 +41,7 @@ type = 3
 script = ExtResource("4_ydx7p")
 mesh = ExtResource("8_y05nv")
 color = Color(0.27451, 0.27451, 0.364706, 1)
-type = 4
+type = 5
 
 [sub_resource type="Resource" id="Resource_stcqu"]
 script = ExtResource("4_ydx7p")
@@ -67,6 +67,8 @@ script = ExtResource("1_1xefc")
 movespeed = 9
 minzoom = 30.0
 maxheight = 40.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Scene" type="Node3D" parent="."]
 
