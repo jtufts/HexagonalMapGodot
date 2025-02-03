@@ -1,7 +1,7 @@
 extends Camera3D
 
 @export_category("Movement")
-@export var movespeed = 8
+@export var movespeed = 20
 @export var zoomspeed = 2
 @export var minzoom = 25.0
 @export var maxzoom = 90.0

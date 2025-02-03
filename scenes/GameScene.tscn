@@ -1,6 +1,7 @@
-[gd_scene load_steps=22 format=3 uid="uid://bbqxpsy3vniy8"]
+[gd_scene load_steps=24 format=3 uid="uid://bbqxpsy3vniy8"]
 
 [ext_resource type="Script" path="res://scripts/camera_script.gd" id="1_1xefc"]
+[ext_resource type="Texture2D" uid="uid://bpkmsrhbkkfdd" path="res://assets//2DHUDAssets//FantaCiv_UI.png" id="2_40pgd"]
 [ext_resource type="Texture2D" uid="uid://dvbkqw12i4obk" path="res://assets/Materials/SkyBG.png" id="2_l7mlp"]
 [ext_resource type="Script" path="res://scripts/world_gen.gd" id="3_davhy"]
 [ext_resource type="Script" path="res://scripts/tile_mesh_data.gd" id="4_ydx7p"]
@@ -11,6 +12,7 @@
 [ext_resource type="Script" path="res://scripts/object_placer.gd" id="9_p13dw"]
 [ext_resource type="Script" path="res://scripts/pathfinder.gd" id="10_0b4my"]
 [ext_resource type="PackedScene" uid="uid://5hq7deseilvo" path="res://scenes/POI/VillageScene.tscn" id="10_hcqfn"]
+[ext_resource type="Texture2D" uid="uid://c2qjgsm5frib4" path="res://assets/2DHUDAssets/FantaCiv_TooltipBG.png" id="11_bo15d"]
 [ext_resource type="PackedScene" uid="uid://xm2lgya4capr" path="res://scenes/Cursors/hexagon_cursor.tscn" id="11_rshvd"]
 [ext_resource type="PackedScene" uid="uid://bb3hit25an5ti" path="res://scenes/Cursors/hex_overlay.tscn" id="12_0kgq4"]
 [ext_resource type="Script" path="res://scripts/interaction.gd" id="12_tt8b8"]
@@ -69,6 +71,32 @@ minzoom = 30.0
 maxheight = 40.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+follow_viewport_enabled = true
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_40pgd")
+
+[node name="TileDescription" type="TextureRect" parent="CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("11_bo15d")
+
+[node name="TileLabel" type="Label" parent="CanvasLayer/TileDescription"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
 
 [node name="Scene" type="Node3D" parent="."]
 

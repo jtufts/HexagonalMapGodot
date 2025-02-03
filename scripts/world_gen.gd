@@ -67,10 +67,11 @@ func generate_world():
 	
 	var map = create_map(positions) #Create map
 	placed_tiles.append_array(map)
+	print(placed_tiles.size())
 	print("-- create_map() took: " + str(Time.get_ticks_msec() - lasttime) + " ms --")
 	lasttime = Time.get_ticks_msec()
 	
-	var placeable = get_placeable_tiles()
+	var placeable = get_placeable_tiles(placed_tiles)
 	var village_count = calculate_villages(placeable.size())
 	object_placer.place_villages(placeable, village_count, spacing)
 	print("-- Calculating and placing villages took: " + str(Time.get_ticks_msec() - lasttime) + " ms --")
@@ -255,11 +256,12 @@ func calculate_villages(valid_tiles : int) -> int:
 
 
 ## Ignore buffer and ocean to send to object placer
-func get_placeable_tiles() -> Array[Tile]:
-	var placeable_tiles : Array[Tile] = []
-	var limit = radius - map_edge_buffer
+func get_placeable_tiles(placed_tiles: Array[Tile]) -> Array[Tile]:
+	var placeable_tiles: Array[Tile] = []
+	var yUpperLimit = map_height - 4
+	var yLowerLimit = 3
 	for tile : Tile in placed_tiles:
-		if abs(tile.column + tile.row) >= limit or abs(tile.column) >= limit or abs(tile.row) >= limit or tile.meshdata.type == Tile.biome_type.Ocean:
+		if abs(tile.row) > yUpperLimit or abs(tile.row) < yLowerLimit or tile.meshdata.type == Tile.biome_type.Ocean:
 			continue
 		placeable_tiles.append(tile)
 	print(str(placeable_tiles.size()) + " placeable tiles")
@@ -331,50 +333,6 @@ func findTilesAdjacentToBlob(blobArray: Array[Coordinate]) -> Array[Coordinate]:
 			if candidateY >= 0 and candidateY <= map_height - 1:
 				if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
 					adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		#Northwest
-		#candidateX = q - 1
-		#if candidateX < 0:
-			#candidateX = map_width - 1
-		#candidateY = r + ((q-1) - ((q-1)%2)) / 2
-		#if candidateY >= 0:
-			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		##North
-		#candidateX = q
-		#candidateY = (r - 1) + (q - (q%2)) / 2
-		#if candidateY >= 0:
-			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		##Northeast
-		#candidateX = q + 1
-		#if candidateX >= map_width:
-			#candidateX = 0
-		#candidateY = (r - 1) + ((q+1) - ((q+1)%2)) / 2
-		#if candidateY >= 0:
-			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		##Southwest
-		#candidateX = q - 1
-		#if candidateX < 0:
-			#candidateX = map_width - 1
-		#candidateY = r + 1 + ((q-1) - ((q - 1)%2)) / 2
-		#if candidateY < map_height:
-			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		##South
-		#candidateX = q
-		#candidateY = r + 1 + (q - (q%2)) / 2
-		#if candidateY < map_height:
-			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
-		##Southeast
-		#candidateX = q + 1
-		#if candidateX >= map_width:
-			#candidateX = 0
-		#candidateY = r + ((q+1) - ((q+1)%2)) / 2
-		#if candidateY < map_height:
-			#if !coordinateIsInArray(candidateX, candidateY, blobArray) and !coordinateIsInArray(candidateX, candidateY, adjacentTiles):
-				#adjacentTiles.append(Coordinate.new(candidateX, candidateY))
 	return adjacentTiles
 func coordinateIsInArray(x: int, y: int, array: Array[Coordinate]) -> bool:
 	for compareTo : Coordinate in array:
