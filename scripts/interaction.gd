@@ -24,41 +24,29 @@ func _ready() -> void:
 	deselect()
 	
 func _input(event: InputEvent) -> void:
-	print(event)
 	if event is InputEventMouseMotion:
-		print(event)
 		var mouse_pos = get_viewport().get_mouse_position()
 		var origin = main_camera.project_ray_origin(mouse_pos)
 		var dir = main_camera.project_ray_normal(mouse_pos)
 		var end = origin + dir * 1000
 		var hit_object = raycast_at_mouse(origin, end)
-		print(hit_object)
 		if hit_object != null:
 			show_tooltip(hit_object)
+			%TileDescription.set_position(Vector2(mouse_pos.x + 10, mouse_pos.y - 110))
 		else:
 			hide_tooltip()
-		#if not not hit_object:
-			#print(hit_object.biome)
-		#if (current_hover != hit_object):
-			#current_hover = hit_object
-			#hide_tooltip()
-			#show_tooltip(hit_object)
-		#if not hit_object:
-			#hide_tooltip()
-		#else:
-			#show_tooltip(hit_object)
-	#if event is InputEventMouseButton:
-		#var mouse_pos = get_viewport().get_mouse_position()
-		#var origin = main_camera.project_ray_origin(mouse_pos)
-		#var dir = main_camera.project_ray_normal(mouse_pos)
-		#var end = origin + dir * 1000
-		#var hit_object = raycast_at_mouse(origin, end)
-		#if not hit_object:
-			#return
-		#if Input.is_action_just_pressed("Click") and event.pressed:
-			#attempt_select(hit_object)
-		#elif Input.is_action_just_pressed("RightClick"):
-			#attempt_move_unit(hit_object)
+	if event is InputEventMouseButton:
+		var mouse_pos = get_viewport().get_mouse_position()
+		var origin = main_camera.project_ray_origin(mouse_pos)
+		var dir = main_camera.project_ray_normal(mouse_pos)
+		var end = origin + dir * 1000
+		var hit_object = raycast_at_mouse(origin, end)
+		if not hit_object:
+			return
+		if Input.is_action_just_pressed("Click") and event.pressed:
+			attempt_select(hit_object)
+		elif Input.is_action_just_pressed("RightClick"):
+			attempt_move_unit(hit_object)
 	
 
 
@@ -118,8 +106,11 @@ func highlight_unit(unit):
 	move_cursor(unit_cursor, unit.position)
 	unit_cursor.visible = true
 
-func show_tooltip(tile):
-	%TileLabel.text = tile.biome
+func show_tooltip(hit):
+	if hit.is_in_group("tiles"):
+		%TileLabel.text = hit.biome
+	elif hit.is_in_group("units"):
+		%TileLabel.text = hit.unit_name + ",\n" + hit.occupied_tile.biome
 	%TileDescription.show()
 
 func hide_tooltip():

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://0hhscr45rb8y"
-path="res://.godot/imported/flathexagon.glb-27abe439f5a7f8cffa73e8f24e6039a4.scn"
+uid="uid://dkibj7jx3x1db"
+path="res://.godot/imported/flathexagon_base.glb-bd308d71279a452ea2cb49c9f09316b8.scn"
 
 [deps]
 
-source_file="res://assets/Meshes/flathexagon.glb"
-dest_files=["res://.godot/imported/flathexagon.glb-27abe439f5a7f8cffa73e8f24e6039a4.scn"]
+source_file="res://assets/Meshes/flathexagon_base.glb"
+dest_files=["res://.godot/imported/flathexagon_base.glb-bd308d71279a452ea2cb49c9f09316b8.scn"]
 
 [params]
 
@@ -31,6 +31,13 @@ animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
-_subresources={}
+_subresources={
+"materials": {
+"grass_texture": {
+"use_external/enabled": true,
+"use_external/path": "res://assets/Resources/Tiles/grass_texture.tres"
+}
+}
+}
 gltf/naming_version=1
 gltf/embedded_image_handling=1
