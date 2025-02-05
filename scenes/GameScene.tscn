@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://bbqxpsy3vniy8"]
+[gd_scene load_steps=26 format=3 uid="uid://bbqxpsy3vniy8"]
 
 [ext_resource type="Script" path="res://scripts/camera_script.gd" id="1_1xefc"]
 [ext_resource type="Texture2D" uid="uid://bpkmsrhbkkfdd" path="res://assets/2DHUDAssets/FantaCiv_UI.png" id="2_40pgd"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://bb3hit25an5ti" path="res://scenes/Cursors/hex_overlay.tscn" id="12_0kgq4"]
 [ext_resource type="Script" path="res://scripts/interaction.gd" id="12_tt8b8"]
 [ext_resource type="PackedScene" uid="uid://cqxjxq25t6wuy" path="res://scenes/Cursors/unit_cursor.tscn" id="13_ydfkh"]
+[ext_resource type="PackedScene" uid="uid://bsdehnluclnjx" path="res://assets/Meshes/flathexagon_overlay.glb" id="17_qp5v5"]
 
 [sub_resource type="Environment" id="Environment_f2ci6"]
 background_mode = 3
@@ -147,6 +148,7 @@ village = ExtResource("10_hcqfn")
 [node name="Pathfinder" type="Node" parent="Builder"]
 script = ExtResource("10_0b4my")
 highlight_marker = ExtResource("12_0kgq4")
+overlay_marker = ExtResource("17_qp5v5")
 
 [node name="Interaction_tracker" type="Node3D" parent="Builder" node_paths=PackedStringArray("main_camera", "p_finder")]
 script = ExtResource("12_tt8b8")

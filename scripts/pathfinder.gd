@@ -6,8 +6,10 @@ const NEIGHBOR_DIRECTIONS = [
 	Vector2(-1, 0), Vector2(-1, 1), Vector2(0, 1)
 ]
 @export var highlight_marker : PackedScene
+@export var overlay_marker : PackedScene
 var world_map : Dictionary = {}
 var markers = []
+var overlays = []
 
 
 func init_map_info(map : Array[Tile]):
@@ -17,7 +19,7 @@ func init_map_info(map : Array[Tile]):
 	print("Pathtfinder initialized")
 
 
-func find_reachable_tiles(start : Tile, movement_range: int) -> Array[Node3D]:
+func find_reachable_tiles(start : Tile, movement_range: int, check_for_water: bool) -> Array[Node3D]:
 	var queue = []
 	var visited = []
 	var reachable_tiles : Array[Node3D]
@@ -42,7 +44,7 @@ func find_reachable_tiles(start : Tile, movement_range: int) -> Array[Node3D]:
 		# Explore neighbors
 		for direction in NEIGHBOR_DIRECTIONS:
 			var neighbor_coords = Vector2(q + direction.x, r + direction.y + (q + direction.x - (int(q + direction.x)%2)) / 2)
-			if not is_tile_valid(neighbor_coords) or visited.has(neighbor_coords):
+			if not is_tile_valid(neighbor_coords, false) or visited.has(neighbor_coords):
 				continue
 			var neighbor_tile = world_map[neighbor_coords]
 			queue.append({"tile": neighbor_tile, "distance": current_distance + 1})
@@ -50,12 +52,11 @@ func find_reachable_tiles(start : Tile, movement_range: int) -> Array[Node3D]:
 
 	return reachable_tiles
 
-
-func is_tile_valid(coords : Vector2) -> bool:
+func is_tile_valid(coords : Vector2, check_for_water: bool) -> bool:
 	var valid = false
 	if coords in world_map:
 		var tile = world_map[coords]
-		if tile.occupier == null and tile.meshdata.type != Tile.biome_type.Ocean:
+		if (tile.occupier == null and tile.meshdata.type != Tile.biome_type.Ocean) or check_for_water == false:
 			valid = true
 	return valid
 
@@ -65,7 +66,25 @@ func clear_highlight():
 		for m in markers:
 			m.visible = false
 
+func clear_overlays():
+	if overlays and overlays.size() > 0:
+		for o in overlays:
+			o.visible = false
 
+func overlay_tile(selected_nodes: Array[Node3D]):
+	#Ensure correct marker count
+	var marker_diff = selected_nodes.size()
+	for m in range(marker_diff):
+		var new_marker = overlay_marker.instantiate()
+		add_child(new_marker)
+		overlays.append(new_marker)
+	# Iterate over selected tiles
+	for i in range(selected_nodes.size()):
+		var marker = overlays[overlays.size() - i - 1]
+		var tile : Tile = selected_nodes[i]
+		marker.position = tile.position
+		marker.visible = true
+		
 func highlight_tile(selected_nodes: Array[Node3D]):
 	#Ensure correct marker count
 	var marker_diff = selected_nodes.size() - markers.size()

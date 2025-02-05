@@ -48,6 +48,10 @@ func _input(event: InputEvent) -> void:
 		elif Input.is_action_just_pressed("RightClick"):
 			attempt_move_unit(hit_object)
 	
+	if event is InputEventKey:
+		if unit_cursor.visible:
+			if event.pressed and event.keycode == KEY_Q:
+				found_city()
 
 
 func raycast_at_mouse(origin, end) -> Node3D:
@@ -60,6 +64,10 @@ func raycast_at_mouse(origin, end) -> Node3D:
 			deselect()
 			return null
 
+func found_city():
+	var city_tiles = p_finder.find_reachable_tiles(selected_unit.occupied_tile, 1, false)
+	p_finder.overlay_tile(city_tiles)
+	selected_unit.queue_free()
 
 func deselect():
 	hide_cursor(tile_cursor)
@@ -91,7 +99,7 @@ func select_unit(unit):
 	hide_cursor(tile_cursor)
 	if unit is Unit:
 		highlight_unit(unit)
-		unit_moves = p_finder.find_reachable_tiles(unit.occupied_tile, unit.movement_range)
+		unit_moves = p_finder.find_reachable_tiles(unit.occupied_tile, unit.movement_range, true)
 		p_finder.highlight_tile(unit_moves)
 
 
